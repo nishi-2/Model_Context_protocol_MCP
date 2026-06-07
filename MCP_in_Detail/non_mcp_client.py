@@ -29,11 +29,11 @@ def calculate_cost(prompt_tokens: int, completion_tokens: int) -> float:
 
 def print_metrics(stage: str, latency: float, usage, cost: float):
     """Helper function to print formatted metric logs"""
-    print(f"\n📊 --- METRICS: {stage} ---")
+    print(f"\n --- METRICS: {stage} ---")
     print(f"⏱️  Latency: {latency:.2f} seconds")
     if usage:
-        print(f"🪙  Tokens : {usage.prompt_tokens} In | {usage.completion_tokens} Out | {usage.total_tokens} Total")
-        print(f"💸  Cost   : ${cost:.6f}")
+        print(f"  Tokens : {usage.prompt_tokens} In | {usage.completion_tokens} Out | {usage.total_tokens} Total")
+        print(f"  Cost   : ${cost:.6f}")
     print("-" * 40, "\n")
 
 
@@ -105,10 +105,10 @@ def main(query: str):
     ]
 
     messages = [{"role": "user", "content": query}]
-    print(f"👤 User Query: {query}")
+    print(f" User Query: {query}")
 
     # Phase 1 - Initial AI Call
-    print("\n⏳ Sending query to OpenAI to determine routing and arguments...")
+    print("\n Sending query to OpenAI to determine routing and arguments...")
     start_time = time.time()
 
     response = client.chat.completions.create(
@@ -125,7 +125,7 @@ def main(query: str):
     response_message = response.choices[0].message
     total_run_cost = phase1_cost
 
-    print(f"📥 OpenAI Phase 1 Response Message:\n{response_message}")
+    print(f" OpenAI Phase 1 Response Message:\n{response_message}")
 
     if response_message.tool_calls:
         messages.append(response_message)
@@ -134,7 +134,7 @@ def main(query: str):
             tool_name = tool_call.function.name
             tool_args = json.loads(tool_call.function.arguments)
 
-            print(f"\n🧠 AI routed to tool: '{tool_name}' with arguments: {tool_args}")
+            print(f"\n AI routed to tool: '{tool_name}' with arguments: {tool_args}")
 
             # Phase 2 - Execute the tool function selected by the model
             local_start_time = time.time()
@@ -151,7 +151,7 @@ def main(query: str):
                 result = "Error: Unknown tool called."
 
             local_latency = time.time() - local_start_time
-            print(f"⚡ Local execution of calculation completed: {result}")
+            print(f" Local execution of calculation completed: {result}")
             print_metrics("Phase 2 - Local Tool Execution", local_latency, None, 0.0)
 
             messages.append({
@@ -162,7 +162,7 @@ def main(query: str):
             })
 
         # Phase 3 - Final API Call to get the final response after tool execution
-        print("⏳ Sending math result back to OpenAI for final response generation...")
+        print(" Sending math result back to OpenAI for final response generation...")
         start_time_final = time.time()
         
         final_response = client.chat.completions.create(
@@ -175,12 +175,12 @@ def main(query: str):
         print_metrics("Phase 3 - Final API Call after Tool Execution", phase3_latency, final_response.usage, phase3_cost)
 
         total_run_cost += phase3_cost
-        print(f"🤖 AI Final Answer: {final_response.choices[0].message.content}")
-        print(f"\n💰 Total Cost of this operation: ${total_run_cost:.6f}")
+        print(f" AI Final Answer: {final_response.choices[0].message.content}")
+        print(f"\n Total Cost of this operation: ${total_run_cost:.6f}")
 
     else:
-        print(f"\n🤖 AI Answered directly: {response_message.content}")
-        print(f"\n💰 Total Cost of this operation: ${total_run_cost:.6f}")
+        print(f"\n AI Answered directly: {response_message.content}")
+        print(f"\n Total Cost of this operation: ${total_run_cost:.6f}")
 
 
 if __name__ == "__main__":

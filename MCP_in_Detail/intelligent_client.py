@@ -23,11 +23,11 @@ def calculate_cost(prompt_tokens: int, completion_tokens: int) -> float:
 
 def print_metrics(stage: str, latency: float, usage, cost: float):
     """Helper to print nicely formatted metric logs."""
-    print(f"\n📊 --- METRICS: {stage} ---")
-    print(f"⏱️  Latency: {latency:.2f} seconds")
+    print(f"\n --- METRICS: {stage} ---")
+    print(f"  Latency: {latency:.2f} seconds")
     if usage:
-        print(f"🪙  Tokens : {usage.prompt_tokens} In | {usage.completion_tokens} Out | {usage.total_tokens} Total")
-        print(f"💸  Cost   : ${cost:.8f}")
+        print(f"  Tokens : {usage.prompt_tokens} In | {usage.completion_tokens} Out | {usage.total_tokens} Total")
+        print(f"  Cost   : ${cost:.8f}")
     print("--------------------------------------")
 
 async def run_intelligent_client(query: str):
@@ -44,7 +44,7 @@ async def run_intelligent_client(query: str):
         async with ClientSession(read_stream, write_stream) as session:
             await session.initialize()
 
-            print("\n✅ Connected to MCP Server!")
+            print("\n Connected to MCP Server!")
 
             # Phase 2 - Ask MCP Server for the available tools (functions) it has registered
             mcp_tools = await session.list_tools()
@@ -63,7 +63,7 @@ async def run_intelligent_client(query: str):
                 })
 
             # Phase 4 - Sending the prompt and the tool to OpenAI
-            print("\n⏳ Sending query to OpenAI to determine routing...")
+            print("\n Sending query to OpenAI to determine routing...")
             messages = [{"role": "user", "content": query}]
             
             start_time = time.time()
@@ -89,7 +89,7 @@ async def run_intelligent_client(query: str):
                     tool_name = tool_call.function.name
                     tool_args = json.loads(tool_call.function.arguments)
                     
-                    print(f"\n🧠 AI routing to tool: '{tool_name}' with arguments: {tool_args}")
+                    print(f"\n AI routing to tool: '{tool_name}' with arguments: {tool_args}")
                     
                     # Phase 6 - Execute the tool locally on our MCP Server!
                     mcp_start_time = time.time()
@@ -109,7 +109,7 @@ async def run_intelligent_client(query: str):
                     })
                     
                 # Phase 7 - Send the math result back to OpenAI for a final friendly answer
-                print("\n⏳ Sending math result back to OpenAI for final answer...")
+                print("\n Sending math result back to OpenAI for final answer...")
                 start_time_final = time.time()
                 
                 final_response = await client.chat.completions.create(
@@ -123,11 +123,11 @@ async def run_intelligent_client(query: str):
                 
                 total_run_cost += stage3_cost
                 
-                print(f"\n🤖 AI Final Answer: {final_response.choices[0].message.content}")
-                print(f"💰 Total Cost for this interaction: ${total_run_cost:.8f}\n")
+                print(f"\n AI Final Answer: {final_response.choices[0].message.content}")
+                print(f" Total Cost for this interaction: ${total_run_cost:.8f}\n")
             else:
-                print(f"\n🤖 AI Answered directly: {response_message.content}")
-                print(f"💰 Total Cost for this interaction: ${total_run_cost:.8f}\n")
+                print(f"\n AI Answered directly: {response_message.content}")
+                print(f" Total Cost for this interaction: ${total_run_cost:.8f}\n")
 
 if __name__ == "__main__":
     question = "I have 1245 apples. If I divide them equally among 5 friends, how many does each get?"
