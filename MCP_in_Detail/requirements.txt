@@ -1,0 +1,6 @@
+openai
+fastmcp
+mcp
+questionary
+python-dotenv
+asyncio
